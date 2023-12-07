@@ -12,13 +12,13 @@ class DominantColors:
     _colors = None
     _labels = None
 
-    def __init__(self, image: str, clusters: int =7, max_dim: int = 500):
+    def __init__(self, image: str, clusters: int = 7, max_dim: int = 500):
         self.CLUSTERS = clusters
         self.MAX_DIM = max_dim
         self._IMG_PATH = image
 
     def extractColors(self) -> list[list[int]]:
-        img = cv2.imread(self._IMG_PATH)
+        img = cv2.imdecode(self._IMG_PATH, cv2.IMREAD_UNCHANGED)
 
         # NOTE: Downscale/resize image
         # image dimensions order: Height, Width, Depth
@@ -53,6 +53,3 @@ class DominantColors:
         self._labels = kmeans.labels_
 
         return self._colors.tolist()
-
-    def rgb_to_hex(self, rgb: list[int]) -> str:
-        return '#{:02x}{:02x}{:02x}'.format(rgb[0], rgb[1], rgb[2])

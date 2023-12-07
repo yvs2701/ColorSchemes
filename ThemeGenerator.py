@@ -64,12 +64,12 @@ class ThemeGenerator:
             secondary_shadow[0] -= 20
         else:
             secondary_shadow[0] += 20
-        
+
         # adjusting hue if out of range
         if primary_shadow[0] < 0:
             primary_shadow[0] = 360 + primary_shadow[0]
         elif primary_shadow[0] > 360:
-            primary_shadow[0] = primary_shadow[0] - 360 
+            primary_shadow[0] = primary_shadow[0] - 360
         if secondary_shadow[0] < 0:
             secondary_shadow[0] = 360 + secondary_shadow[0]
         elif secondary_shadow[0] > 360:
