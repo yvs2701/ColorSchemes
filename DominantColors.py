@@ -7,7 +7,7 @@ class DominantColors:
 
     CLUSTERS: int = None
     MAX_DIM: int = None
-    _IMG_PATH: str = None
+    _IMG_DATA: str = None
     _image = None
     _colors = None
     _labels = None
@@ -15,10 +15,10 @@ class DominantColors:
     def __init__(self, image: str, clusters: int = 7, max_dim: int = 500):
         self.CLUSTERS = clusters
         self.MAX_DIM = max_dim
-        self._IMG_PATH = image
+        self._IMG_DATA = image
 
     def extractColors(self) -> list[list[int]]:
-        img = cv2.imdecode(self._IMG_PATH, cv2.IMREAD_UNCHANGED)
+        img = cv2.imdecode(self._IMG_DATA, cv2.IMREAD_UNCHANGED)
 
         # NOTE: Downscale/resize image
         # image dimensions order: Height, Width, Depth
