@@ -43,7 +43,7 @@ class DominantColors:
         self._image = img
 
         # using k-means to cluster pixels
-        kmeans = KMeans(n_clusters=self.CLUSTERS, n_init='auto')
+        kmeans = KMeans(n_clusters=self.CLUSTERS, random_state=42)
         kmeans.fit(img)
 
         # cluster centers are dominant colors

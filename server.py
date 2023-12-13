@@ -44,7 +44,14 @@ def generate_colors():
         for _, swatch in enumerate(theme):
             hexcodes.append(rgb_to_hex(swatch))
 
-        return jsonify({'hex_colors': hexcodes, 'rgb_colors': theme}), 200
+        labels = ['primary_color', 'secondary_color',
+                  'primary_tint', 'secondary_tint',
+                  'primary_shadow', 'secondary_shadow']
+
+        dict_theme = dict(zip(labels, theme))
+        dict_hexcodes = dict(zip(labels, hexcodes))
+
+        return jsonify({'hex_colors': dict_hexcodes, 'rgb_colors': dict_theme}), 200
 
     except KeyError:
         return jsonify({'error': 'rgb_color not found in request'}), 400
