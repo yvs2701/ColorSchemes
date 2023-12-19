@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, send_from_directory, request, jsonify
 from DominantColors import DominantColors
 from ThemeGenerator import ThemeGenerator
 import numpy as np
+import os
 
 
-app = Flask(__name__, static_url_path='',
-            static_folder='static', template_folder='templates')
+app = Flask(__name__, static_url_path='', static_folder='frontend/build')
 
 
 def rgb_to_hex(rgb: list[int]) -> str:
@@ -57,9 +57,13 @@ def generate_colors():
         return jsonify({'error': 'rgb_color not found in request'}), 400
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serverFrontend(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 
 if __name__ == '__main__':
