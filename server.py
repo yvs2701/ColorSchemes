@@ -1,4 +1,6 @@
+import base64
 from flask import Flask, send_from_directory, request, jsonify
+from flask_cors import CORS
 from DominantColors import DominantColors
 from ThemeGenerator import ThemeGenerator
 import numpy as np
@@ -6,6 +8,7 @@ import os
 
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/build')
+cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 
 def rgb_to_hex(rgb: list[int]) -> str:
@@ -15,11 +18,21 @@ def rgb_to_hex(rgb: list[int]) -> str:
 @app.route('/api/extract_colors', methods=['POST'])
 def extract_colors():
     try:
+        if 'imgData' not in request.form.keys():
+            raise KeyError('File \'imgData\' missing in the request')
+
+        img = request.form['imgData'].split("base64,")[1]
+        img = base64.decodebytes(bytes(img, "utf-8"))
+
         # Thanks to: https://stackoverflow.com/a/48002503
-        img = request.files['imgData'].read()
         data = np.frombuffer(img, np.uint8)
 
-        dc = DominantColors(data)
+        if 'noOfColors' in request.form.keys():
+            noOfColors = int(request.form['noOfColors'])
+        else:
+            noOfColors = 7
+
+        dc = DominantColors(image=data, clusters=noOfColors)
         colors = dc.extractColors()
         hexcodes = []
 

@@ -8,5 +8,5 @@ span.contrastingText {
     color: transparent;
     background: inherit;
     background-clip: text;
-    filter: invert(1) contrast(1.5);
+    filter: invert(1) grayscale(1) contrast(8);
 }

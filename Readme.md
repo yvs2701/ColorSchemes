@@ -16,7 +16,19 @@ git clone https://github.com/yvs2701/ColorSchemes.git
 pip install -r requirements.txt
 ```
 
+3. Install the dependencies for the frontend
+```bash
+cd frontend
+npm install
+```
+
 3. Run the Flask server
 ```bash
 python -m flask --app server run
+```
+
+4. Run the frontend
+```bash
+cd frontend
+npm start
 ```
