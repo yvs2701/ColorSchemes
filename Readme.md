@@ -30,5 +30,5 @@ python -m flask --app server run
 4. Run the frontend
 ```bash
 cd frontend
-npm start
+npm run dev
 ```
