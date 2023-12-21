@@ -12,7 +12,7 @@ class DominantColors:
     _colors = None
     _labels = None
 
-    def __init__(self, image: str, clusters: int = 7, max_dim: int = 500):
+    def __init__(self, image: str, clusters: int = 5, max_dim: int = 500):
         self.CLUSTERS = clusters
         self.MAX_DIM = max_dim
         self._IMG_DATA = image

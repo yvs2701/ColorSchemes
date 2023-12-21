@@ -30,7 +30,7 @@ def extract_colors():
         if 'noOfColors' in request.form.keys():
             noOfColors = int(request.form['noOfColors'])
         else:
-            noOfColors = 7
+            noOfColors = 5
 
         dc = DominantColors(image=data, clusters=noOfColors)
         colors = dc.extractColors()

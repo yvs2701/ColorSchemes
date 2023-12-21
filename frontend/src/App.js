@@ -3,12 +3,12 @@ import { sampleImg } from "./components/sampleImageBase64";
 
 function App() {
 
-  const [noOfColors, setNoOfColors] = useState(7);
+  const [noOfColors, setNoOfColors] = useState(5);
   const [uploading, setUploading] = useState(false);
   const [imgData, setImgData] = useState(sampleImg);
   const [colors, setColors] = useState({
-    "hex_colors": ["#1c374a", "#dadaee", "#948e99", "#9fc9e4", "#ece2ee", "#4d6275", "#c0d2e9"],
-    "rgb_colors": [[28, 55, 74], [218, 218, 238], [148, 142, 153], [159, 201, 228], [236, 226, 238], [77, 98, 117], [192, 210, 233]]
+    "hex_colors": ["#223e51", "#ccd6ed", "#737a88", "#a6c5dd", "#eae1ee"],
+    "rgb_colors": [[34, 62, 81], [204, 214, 237], [115, 122, 136], [166, 197, 221], [234, 225, 238]],
   });
 
   useEffect(() => {
@@ -50,12 +50,11 @@ function App() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
         setColors(data);
         setUploading(false)
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         setUploading(false)
       })
   }
@@ -89,13 +88,13 @@ function App() {
             }}
           />
           {/* IMAGE PREVIEW AREA */}
+          {/* FIXME: PREVENT RESIZING THE PAGE */}
           <div
             className="w-full h-5/6 flex-initial join-item rounded overflow-hidden"
             style={{ background: `no-repeat center/cover url(${imgData})` }}
           >
-            <img src={imgData} alt="preview image"
-              className="w-full h-full object-contain"
-              style={{ backdropFilter: "blur(64px)" }}
+            <img src={imgData} alt="preview of uploaded file"
+              className="w-full h-full object-contain backdrop-blur-3xl"
             />
           </div>
         </div>
@@ -147,15 +146,21 @@ function App() {
           colors?.hex_colors?.map((color, idx) => (
             <div
               key={idx}
-              className="colorTheme flex justify-center items-center join-item border-base-100 w-full"
+              className="colorTheme flex justify-center items-center join-item w-full"
               style={{ backgroundColor: color }}
             >
-              <span
-                className="text-4xl text-center font-bold contrastingText"
-                style={{ writingMode: "sideways-lr" }}
-              >
-                {color}
-              </span>
+              <div className="tooltip bg-inherit" data-tip="click to copy">
+                <button
+                  className="text-5xl text-center font-bold contrasting-text vertical-text cursor-copy select-all"
+                  onClick={(e) => {
+                    const text = e.target.innerText
+                    navigator.clipboard.writeText(text)
+                    console.log("copied " + text + " to clipboard")
+                  }}
+                >
+                  {color}
+                </button>
+              </div>
             </div>
           ))
         }

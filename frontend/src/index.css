@@ -2,11 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-span.contrastingText {
+.contrasting-text {
     /* color: white; */
     /* mix-blend-mode: difference; */
     color: transparent;
     background: inherit;
     background-clip: text;
     filter: invert(1) grayscale(1) contrast(8);
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
 }
