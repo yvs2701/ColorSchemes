@@ -8,7 +8,7 @@ import os
 
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/build')
-cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+cors = CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}})
 
 
 def rgb_to_hex(rgb: list[int]) -> str:
@@ -43,12 +43,15 @@ def extract_colors():
 
     except KeyError:
         return jsonify({'error': 'File \'imgData\' missing in the request'}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Some error occured!'}), 500
 
 
 @app.route('/api/generate_colors', methods=['POST'])
 def generate_colors():
-    req = request.get_json()
     try:
+        req = request.get_json()
         base_color = req['rgb_color']
         tg = ThemeGenerator(base_color=base_color, isRGB=True)
         theme = tg.generate()
@@ -68,6 +71,9 @@ def generate_colors():
 
     except KeyError:
         return jsonify({'error': 'rgb_color not found in request'}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Some error occured!'}), 500
 
 
 @app.route('/', defaults={'path': ''})
