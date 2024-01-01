@@ -4,7 +4,7 @@ import t, { useToasterStore } from "react-hot-toast";
 const useToast = () => {
   const { toasts } = useToasterStore();
 
-  const [toastLimit, setToastLimit] = useState(3);
+  const [toastLimit, setToastLimit] = useState(2);
 
   useEffect(() => {
     toasts

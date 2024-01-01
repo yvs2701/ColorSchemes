@@ -180,12 +180,10 @@ export default function ColorExtractor() {
                         const text = e.target.innerText
                         navigator.clipboard.writeText(text)
                         toast.custom((t) => (
-                          <span>
-                            <div className={"alert rounded-lg p-2 " +
-                              (t.visible ? 'animate-fade-in' : 'animate-fade-out')}
-                            >
-                              copied to clipboard
-                            </div>
+                          <span className={"bg-success text-center text-success-content rounded-lg p-2 pl-3 pr-3 " +
+                            (t.visible === true ? 'animate-fade-in' : 'animate-fade-out')}
+                          >
+                            copied to clipboard
                           </span>
                         ))
                       }}
