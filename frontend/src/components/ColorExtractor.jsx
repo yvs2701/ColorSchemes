@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { sampleImg } from "./sampleImageBase64";
 import useToast from "./useToast";
 
@@ -11,7 +12,7 @@ export default function ColorExtractor() {
     "hex_colors": ["#223e51", "#ccd6ed", "#737a88", "#a6c5dd", "#eae1ee"],
     "rgb_colors": [[34, 62, 81], [204, 214, 237], [115, 122, 136], [166, 197, 221], [234, 225, 238]],
   });
-  const toast = useToast().toast;
+  const toast = useToast();
 
   // useEffect(() => {
   //   // TODO: FETCH AN IMAGE AND SET IT AS THE DEFAULT IMAGE
@@ -56,24 +57,6 @@ export default function ColorExtractor() {
       console.error(err)
     } finally {
       setUploading(false)
-    }
-  }
-
-  const generateTheme = async (rgb_color) => {
-    try {
-      const payload = JSON.stringify({ rgb_color })
-
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/generate_colors`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: payload
-      })
-      const data = await res.json()
-      console.log(data);
-    } catch (err) {
-      console.error(err)
     }
   }
 
@@ -164,7 +147,7 @@ export default function ColorExtractor() {
           {
             colors?.hex_colors?.map((color, idx) => (
               <div
-                key={idx}
+                key={idx + color}
                 className="flex flex-col justify-center items-center join-item w-full overflow-hidden"
                 style={{ backgroundColor: color }}
               >
@@ -192,11 +175,9 @@ export default function ColorExtractor() {
                     </button>
                   </div>
                 </div>
-                <button className="btn btn-block border-none rounded-none"
-                  onClick={async () => await generateTheme(colors.rgb_colors[idx])}
-                >
+                <Link to={`theme-from?c=${colors.rgb_colors[idx]}`} className="btn btn-block border-none rounded-none">
                   Get Theme
-                </button>
+                </Link>
               </div>
             ))
           }

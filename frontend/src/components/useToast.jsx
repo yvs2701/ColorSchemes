@@ -22,7 +22,7 @@ const useToast = () => {
     },
   };
 
-  return { toast };
+  return toast
 };
 
 export default useToast;
