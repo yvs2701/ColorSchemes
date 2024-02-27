@@ -7,10 +7,10 @@ import ColorExtractor from './components/ColorExtractor';
 import ColorTheme from './components/ColorTheme';
 import ErrorPage from './components/ErrorPage';
 
-const router = createBrowserRouter([
+const routesConfig = [
   {
     path: '/',
-    element: < ColorExtractor />
+    element: <ColorExtractor />
   },
   {
     path: '/theme-from',
@@ -56,7 +56,9 @@ const router = createBrowserRouter([
     path: '*',
     element: <ErrorPage title={"Err 404"} message={"The requested page was not found."} />
   }
-])
+]
+
+const router = createBrowserRouter(routesConfig)
 
 function App() {
   return (
@@ -68,3 +70,4 @@ function App() {
 }
 
 export default App
+export { routesConfig }

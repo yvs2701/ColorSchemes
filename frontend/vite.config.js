@@ -11,4 +11,8 @@ export default defineConfig({
     emptyOutDir: true,
   },
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: './tests/setup.js'
+  }
 })
