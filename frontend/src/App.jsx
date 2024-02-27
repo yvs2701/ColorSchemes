@@ -14,26 +14,43 @@ const router = createBrowserRouter([
   },
   {
     path: '/theme-from',
-    loader: ({ request }) => {
+    loader: async ({ request }) => {
       const url = new URL(request.url)
       const rgb_color = url.searchParams.get('c').split(',')
 
+      if (rgb_color === null || rgb_color.length !== 3) {
+        throw new Response('Invalid RGB value', { status: 400 });
+      }
       rgb_color.forEach((value, idx) => {
         if (typeof value === 'string' && isNaN(value) === false) {
           value = parseInt(value)
           rgb_color[idx] = value
 
           if (value < 0 || value > 255) {
-            throw new Error('Invalid RGB value');
+            throw new Response('Invalid RGB value', { status: 400 });
           }
         } else {
-          throw new Error('Invalid RGB value');
+          throw new Response('Invalid RGB value', { status: 400 });
         }
       });
-      return rgb_color
+
+      try {
+        const api_res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/generate_colors`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ rgb_color })
+        });
+        const data = await api_res.json()
+        return { rgb_color, theme_data: data }
+      } catch (err) {
+        console.error(err)
+        throw err
+      }
     },
     element: <ColorTheme />,
-    errorElement: <ErrorPage title={'WDYM?'} message={"Did not get the expected color values."} />
+    errorElement: <ErrorPage />
   },
   {
     path: '*',

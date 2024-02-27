@@ -64,8 +64,8 @@ def generate_colors():
                   'primary_tint', 'secondary_tint',
                   'primary_shadow', 'secondary_shadow']
 
-        dict_theme = dict(zip(labels, theme))
-        dict_hexcodes = dict(zip(labels, hexcodes))
+        dict_theme = list(zip(labels, theme))
+        dict_hexcodes = list(zip(labels, hexcodes))
 
         return jsonify({'hex_colors': dict_hexcodes, 'rgb_colors': dict_theme}), 200
 
