@@ -32,3 +32,11 @@ python -m flask --app server run
 cd frontend
 npm run dev
 ```
+---
+
+Additionally, To build the frontend you can use
+```bash
+cd frontend
+npm run build
+```
+After which flask server can be run to serve the files from the build folder.

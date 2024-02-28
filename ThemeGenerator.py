@@ -2,6 +2,7 @@ import colorsys
 
 
 class ThemeGenerator:
+    _base_color: list[int] = None
     _primary_color: list[int] = None
     _theme: list[list[int]] = None
 
@@ -11,6 +12,7 @@ class ThemeGenerator:
                 base_color[0] / 255, base_color[1] / 255, base_color[2] / 255)
             self._primary_color = [
                 round(h * 360), round(l * 100), round(s * 100)]
+            self._base_color = base_color
         else:
             self._primary_color = base_color
         self._theme = []
@@ -97,5 +99,6 @@ class ThemeGenerator:
             r, g, b = colorsys.hls_to_rgb(
                 swatch[0]/360, swatch[1]/100, swatch[2]/100)
             self._theme[idx] = [round(r * 255), round(g * 255), round(b * 255)]
+        self._theme[0] = self._base_color
 
         return self._theme
