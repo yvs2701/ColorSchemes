@@ -4,6 +4,8 @@ The website provides the frontend interface for users to upload an image which c
 
 Users will also get font and color recommendations for software experience aspects, and generative AI will be used to present the mockup of a room and a web layout where the suggested theme is applied for better visualization.
 
+Link to used dataset: [Hugging Face](https://huggingface.co/datasets/huggingface-projects/color-palettes-sd)
+
 ## Installation
 To install the project, follow these steps:
 1. Clone the git repository
