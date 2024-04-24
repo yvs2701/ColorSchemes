@@ -43,9 +43,14 @@ const routesConfig = [
           body: JSON.stringify({ rgb_color })
         });
         const data = await api_res.json()
+
+        if (api_res.status !== 200) {
+          throw new Error(api_res.status);
+        }
+
         return { rgb_color, theme_data: data }
       } catch (err) {
-        console.error(err)
+        console.error(err.message)
         throw err
       }
     },

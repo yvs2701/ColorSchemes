@@ -76,7 +76,7 @@ def generate_colors():
         return jsonify({'error': 'Some error occured!'}), 500
 
 
-@app.route('/', defaults={'path': ''})
+@app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>')
 def serverFrontend(path):
     if path != "" and os.path.exists(app.static_folder + '/' + path):
