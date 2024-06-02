@@ -15,32 +15,32 @@ const routesConfig = [
   {
     path: '/theme-from',
     loader: async ({ request }) => {
-      const url = new URL(request.url)
-      const rgb_color = url.searchParams.get('c').split(',')
-
-      if (rgb_color === null || rgb_color.length !== 3) {
-        throw new Response('Invalid RGB value', { status: 400 });
-      }
-      rgb_color.forEach((value, idx) => {
-        if (typeof value === 'string' && isNaN(value) === false) {
-          value = parseInt(value)
-          rgb_color[idx] = value
-
-          if (value < 0 || value > 255) {
-            throw new Response('Invalid RGB value', { status: 400 });
-          }
-        } else {
-          throw new Response('Invalid RGB value', { status: 400 });
-        }
-      });
-
       try {
+        const url = new URL(request.url)
+        const hex_colors = url.searchParams.get('c').split(',')
+
+        if (hex_colors === null || hex_colors.length !== 2) {
+          throw new Error('Malformed color data');
+        }
+
+        for (let i = 0; i < hex_colors.length; i++) {
+          hex_colors[i] = '#' + hex_colors[i] // dont change this as everywhere later on frontend code expects 'hex_colors' with pound sign
+          const value = hex_colors[i]
+          if (typeof value === 'string' && value.trim() !== "") {
+            if (/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value) === false) { // check if hex code is valid color value (without the pound sign)
+              throw new Error('Invalid HEX value');
+            }
+          } else {
+            throw new Error('Malformed color data');
+          }
+        }
+
         const api_res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/generate_colors`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ rgb_color })
+          body: JSON.stringify({ hex_colors })
         });
         const data = await api_res.json()
 
@@ -48,7 +48,7 @@ const routesConfig = [
           throw new Error(api_res.status);
         }
 
-        return { rgb_color, theme_data: data }
+        return { hex_colors, theme: data.hex_colors }
       } catch (err) {
         console.error(err.message)
         throw err

@@ -3,27 +3,63 @@ import useToast from "./useToast"
 import { Link, useLoaderData } from "react-router-dom"
 
 export default function ColorTheme() {
+  const { hex_colors, theme } = useLoaderData()
+  const toast = useToast()
+  const lockColor = (index) => {
+    setColors((prev) => {
+      const newLocked = [...prev.locked]
+      const newColors = [...prev.hex_colors]
+      let newLockCount = prev.lock_count
 
-  const extractColors = async () => {
-    setUploading(true)
-    try {
-      alert("This feature is still under development!")
-      setUploading(false)
-    } catch (err) {
-      console.error(err)
-      setUploading(false)
-    }
+      // only 2 colors can be locked at a time
+      if (newLocked[index] === true) {
+        newLocked[index] = false
+        newLockCount--
+      } else if (prev.lock_count === 2) {
+        newLocked[0] = false
+        newLocked[index] = true
+      } else {
+        newLockCount++
+        newLocked[index] = true
+      }
+
+      // swap all locked colors to the left
+      let false_ptr = 0, true_ptr = 1;
+      while (false_ptr < true_ptr && true_ptr < newLocked.length) {
+        if (newLocked[false_ptr] === false && newLocked[true_ptr] === true) {
+          const temp = newColors[false_ptr]
+          newColors[false_ptr] = newColors[true_ptr]
+          newColors[true_ptr] = temp
+
+          newLocked[false_ptr] = true
+          newLocked[true_ptr] = false
+        }
+        if (newLocked[true_ptr] === false) {
+          true_ptr++;
+        }
+        if (newLocked[false_ptr] === true) {
+          false_ptr++;
+        }
+      }
+      return { 'hex_colors': newColors, 'locked': newLocked, 'lock_count': newLockCount }
+    })
   }
 
-  const { rgb_color, theme_data } = useLoaderData()
-  const toast = useToast()
+  const [input_color, setInputColor] = useState([theme[0], theme[1]])
+  const [colors, setColors] = useState({
+    "hex_colors": theme,
+    "locked": [false, false, false, false, false],
+    "lock_count": 0
+  });
 
   useEffect(() => {
-    setColors(theme_data)
-  }, [rgb_color]);
+    setColors({ ...colors, "hex_colors": theme })
+    setInputColor([theme[0], theme[1]])
+  }, [hex_colors]);
 
-  const [uploading, setUploading] = useState(false)
-  const [colors, setColors] = useState(theme_data)
+  useEffect(() => {
+    setInputColor([colors.hex_colors[0], colors.hex_colors[1]])
+  }, [colors]);
 
   return (
     <>
@@ -40,11 +76,18 @@ export default function ColorTheme() {
             Pick a Color
           </h1>
 
-          {/* COLOR PREVIEW AREA */}
-          <div className="colorPreview w-full join join-vertical">
-            <svg viewBox="0 0 100 100" className="preview-svg rounded w-full h-full">
-              <rect x={0} y={0} className="w-full h-full rounded" style={{ fill: `rgb(${rgb_color.join(",")})` }} />
-            </svg>
+          {/* COLOR SELECTOR AREA */}
+          <div className="colorPreview w-full flex justify-around items-center min-h-[33%]">
+            <span className="inline-block w-full rounded aspect-square overflow-hidden mr-4" style={{ background: colors.hex_colors[0] }}>
+              <input type="color" className="cursor-pointer w-full h-full rounded"
+                value={input_color[0]} onChange={(e) => setInputColor(prev => [e.target.value, prev[1]])}
+              />
+            </span>
+            <span className="inline-block w-full rounded aspect-square overflow-hidden" style={{ background: colors.hex_colors[1] }}>
+              <input type="color" className="cursor-pointer w-full h-full rounded"
+                value={input_color[1]} onChange={(e) => setInputColor(prev => [prev[0], e.target.value])}
+              />
+            </span>
           </div>
 
           <div
@@ -52,23 +95,21 @@ export default function ColorTheme() {
           >
             {/* BUTTON GROUP */}
             <div
-              className="btn-group w-full join-item flex justify-between items-center"
+              className="btn-group w-full join-item flex justify-center items-center"
             >
-              <button
-                className={"btn btn-primary w-1/3 flex-initial" + (uploading === true ? "btn-disabled" : "")}
-                onClick={extractColors} disabled={uploading}
-              >
-                {uploading === true ? <span className="loading loading-spinner"></span> : ""}
-                {uploading === true ? "Uploading" : "Upload"}
-              </button>
-              <button
-                className="btn btn-secondary w-1/3 flex-initial"
-                onClick={() => {
-                  alert("This feature is still under development!");
-                }}
-              >
-                Random
-              </button>
+              {
+                input_color[0] === hex_colors[0] && input_color[1] === hex_colors[1] ?
+                  <p
+                    className={'btn btn-secondary w-1/3 flex-initial btn-disabled'}
+                  >
+                    Generate Theme
+                  </p> :
+                  <Link to={`/theme-from?c=${input_color[0].substring(1)},${input_color[1].substring(1)}`}
+                    className={'btn btn-secondary w-1/3 flex-initial'}
+                  >
+                    Generate Theme
+                  </Link>
+              }
             </div>
           </div>
         </section>
@@ -79,9 +120,9 @@ export default function ColorTheme() {
           {
             colors?.hex_colors?.map((color, idx) => (
               <div
-                key={color[0]}
+                key={idx + color}
                 className="flex flex-col justify-center items-center join-item w-full overflow-hidden"
-                style={{ backgroundColor: color[1] }}
+                style={{ backgroundColor: color }}
               >
                 <div className="h-full bg-inherit flex justify-center items-center">
                   <div className="tooltip tooltip-left lg:tooltip-top bg-inherit" data-tip="click to copy">
@@ -103,13 +144,13 @@ export default function ColorTheme() {
                         ))
                       }}
                     >
-                      {color[1]}
+                      {color}
                     </button>
                   </div>
                 </div>
-                <Link to={`/theme-from?c=${colors.rgb_colors[idx][1]}`} className="btn btn-block border-none rounded-none">
-                  Get Theme
-                </Link>
+                <button onClick={() => lockColor(idx)} className="btn btn-block border-none rounded-none">
+                  Lock
+                </button>
               </div>
             ))
           }

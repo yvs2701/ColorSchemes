@@ -10,30 +10,50 @@ export default function ColorExtractor() {
   const [imgData, setImgData] = useState(sampleImg);
   const [colors, setColors] = useState({
     "hex_colors": ["#223e51", "#ccd6ed", "#737a88", "#a6c5dd", "#eae1ee"],
-    "rgb_colors": [[34, 62, 81], [204, 214, 237], [115, 122, 136], [166, 197, 221], [234, 225, 238]],
+    "locked": [false, false, false, false, false],
+    "lock_count": 0
   });
   const toast = useToast();
 
-  // useEffect(() => {
-  //   // TODO: FETCH AN IMAGE AND SET IT AS THE DEFAULT IMAGE
-  //   const timestamp = new Date()
-  //   const year = timestamp.getFullYear()
-  //   const month = timestamp.getMonth() + 1
-  //   const day = timestamp.getDate()
-  //   const imgURL = `https://picsum.photos/seed/${day}-${month}-${year}/800/450`
-  //   fetch(imgData)
-  //     .then((res) => {
-  //       console.log(res);
-  //       return res.blob()
-  //     })
-  //     .then((data) => {
-  //       console.log(URL.createObjectURL(data))
-  //       setImgData(URL.createObjectURL(data))
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // }, [])
+  const lockColor = (index) => {
+    setColors((prev) => {
+      const newLocked = [...prev.locked]
+      const newColors = [...prev.hex_colors]
+      let newLockCount = prev.lock_count
+
+      // only 2 colors can be locked at a time
+      if (newLocked[index] === true) {
+        newLocked[index] = false
+        newLockCount--
+      } else if (prev.lock_count === 2) {
+        newLocked[0] = false
+        newLocked[index] = true
+      } else {
+        newLockCount++
+        newLocked[index] = true
+      }
+
+      // swap all locked colors to the left
+      let false_ptr = 0, true_ptr = 1;
+      while (false_ptr < true_ptr && true_ptr < newLocked.length) {
+        if (newLocked[false_ptr] === false && newLocked[true_ptr] === true) {
+          const temp = newColors[false_ptr]
+          newColors[false_ptr] = newColors[true_ptr]
+          newColors[true_ptr] = temp
+
+          newLocked[false_ptr] = true
+          newLocked[true_ptr] = false
+        }
+        if (newLocked[true_ptr] === false) {
+          true_ptr++;
+        }
+        if (newLocked[false_ptr] === true) {
+          false_ptr++;
+        }
+      }
+      return { 'hex_colors': newColors, 'locked': newLocked, 'lock_count': newLockCount }
+    })
+  }
 
   const extractColors = async () => {
 
@@ -52,7 +72,7 @@ export default function ColorExtractor() {
         body: formData
       })
       const data = await res.json()
-      setColors(data)
+      setColors({ 'hex_colors': data['hex_colors'], 'locked': Array(data['hex_colors'].length).fill(false), 'lock_count': 0 })
     } catch (err) {
       console.error(err)
     } finally {
@@ -115,14 +135,18 @@ export default function ColorExtractor() {
                 {uploading === true ? <span className="loading loading-spinner"></span> : ""}
                 {uploading === true ? "Uploading" : "Upload"}
               </button>
-              <button
-                className="btn btn-secondary w-1/3 flex-initial"
-                onClick={() => {
-                  alert("This feature is still under development!");
-                }}
-              >
-                Random
-              </button>
+              {
+                colors.lock_count !== 2 ?
+                  <p className='btn btn-secondary w-1/3 flex-initial btn-disabled'>
+                    Generate Theme
+                  </p> :
+                  <Link to={`/theme-from?c=${colors['hex_colors'][0].substring(1)},${colors['hex_colors'][1].substring(1)}`}
+                    className='btn btn-secondary w-1/3 flex-initial'
+                  >
+                    Generate Theme
+                  </Link>
+              }
+
             </div>
 
             {/* RANGE INPUT */}
@@ -175,9 +199,9 @@ export default function ColorExtractor() {
                     </button>
                   </div>
                 </div>
-                <Link to={`theme-from?c=${colors.rgb_colors[idx]}`} className="btn btn-block border-none rounded-none">
-                  Get Theme
-                </Link>
+                <button onClick={() => lockColor(idx)} className="btn btn-block border-none rounded-none">
+                  Lock
+                </button>
               </div>
             ))
           }

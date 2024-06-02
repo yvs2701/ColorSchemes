@@ -1,104 +1,38 @@
-import colorsys
+from GAN import Generator
+import torch
 
 
 class ThemeGenerator:
-    _base_color: list[int] = None
-    _primary_color: list[int] = None
-    _theme: list[list[int]] = None
+    _base_colors: list[list[float]] = None
+    _theme: list[str] = None
 
-    def __init__(self, base_color: list, isRGB: bool = True):
-        if isRGB:
-            h, l, s = colorsys.rgb_to_hls(
-                base_color[0] / 255, base_color[1] / 255, base_color[2] / 255)
-            self._primary_color = [
-                round(h * 360), round(l * 100), round(s * 100)]
-            self._base_color = base_color
+    def __init__(self, base_colors: list, isHex: bool = True):
+        if isHex:
+            self._base_colors = [self.hex_to_rgb(color) for color in base_colors]
         else:
-            self._primary_color = base_color
+            self._base_colors = base_colors
+        print('Converted Base_Colors:', self._base_colors)
         self._theme = []
 
-    def generate(self) -> list[list[int]]:
-        # NOTE: FIND COMPLEMENTARY COLOR
-        secondary_color: list[int] = [0, 0, 0]
-        if self._primary_color[0] < 180:
-            secondary_color[0] = 180 + self._primary_color[0]
-        else:
-            secondary_color[0] = self._primary_color[0] - 180
+    def hex_to_rgb(self, hex: str) -> list[float]:
+        if (hex[0] != '#'):
+            hex = '#' + hex
+        return [float(int(hex[i:i + 2], 16)) for i in (1, 3, 5)]
 
-        # reducing brightness by 25%
-        secondary_color[1] = round(self._primary_color[1] * 0.75)
+    def rgb_to_hex(self, r, g, b):
+        return '#{:02x}{:02x}{:02x}'.format(r, g, b)
 
-        # reducing saturation by 30%
-        secondary_color[2] = round(self._primary_color[2] * 0.7)
+    def generate(self) -> list[str]:
+        # Using GAN model to generate the theme.
+        # Older implementation used simple color science and mathematical operations.
+        model = Generator()
+        model.load_state_dict(torch.load('./model/GeneratorV4'))
+        model.eval()
 
-        # NOTE: FIND COLOR TINTS
-        primary_tint = self._primary_color.copy()
-        secondary_tint = secondary_color.copy()
+        out = torch.round(model(torch.tensor([self._base_colors])).detach()).to(torch.int32)[0]
 
-        # brightening by 75%
-        primary_tint[1] = round(primary_tint[1] * 1.75)
-        secondary_tint[1] = round(secondary_tint[1] * 1.75)
-
-        # adjusting brightness if out of range
-        if primary_tint[1] > 100:
-            primary_tint[1] = 100
-        if secondary_tint[1] > 100:
-            secondary_tint[1] = 100
-
-        # desaturating by 75%
-        primary_tint[2] = round(primary_tint[2] * 0.25)
-        secondary_tint[2] = round(secondary_tint[2] * 0.25)
-
-        # NOTE: FIND COLOR SHADOWS
-        primary_shadow = self._primary_color.copy()
-        secondary_shadow = secondary_color.copy()
-
-        # reducing brightness by 50%
-        primary_shadow[1] = round(primary_shadow[1] * 0.5)
-        secondary_shadow[1] = round(secondary_shadow[1] * 0.5)
-
-        # shifting hue towards blue (HUE = 240 deg) by 20 points
-        if primary_shadow[0] > 240:
-            primary_shadow[0] -= 20
-        else:
-            primary_shadow[0] += 20
-        if secondary_shadow[0] > 240:
-            secondary_shadow[0] -= 20
-        else:
-            secondary_shadow[0] += 20
-
-        # adjusting hue if out of range
-        if primary_shadow[0] < 0:
-            primary_shadow[0] = 360 + primary_shadow[0]
-        elif primary_shadow[0] > 360:
-            primary_shadow[0] = primary_shadow[0] - 360
-        if secondary_shadow[0] < 0:
-            secondary_shadow[0] = 360 + secondary_shadow[0]
-        elif secondary_shadow[0] > 360:
-            secondary_shadow[0] = secondary_shadow[0] - 360
-
-        # increasing saturation by 20%
-        primary_shadow[2] = round(primary_shadow[2] * 1.2)
-        secondary_shadow[2] = round(secondary_shadow[2] * 1.2)
-
-        # adjusting saturation if out of range
-        if primary_shadow[2] > 100:
-            primary_shadow[2] = 100
-        if secondary_shadow[2] > 100:
-            secondary_shadow[2] = 100
-
-        # Complete theme: [primary, secondary, primary_tint, secondary_tint, primary_shadow, secondary_shadow]
-        self._theme = [
-            self._primary_color, secondary_color,
-            primary_tint, secondary_tint,
-            primary_shadow, secondary_shadow
-        ]
-
-        # NOTE: COLORSPACE CONVERSION
-        for idx, swatch in enumerate(self._theme):
-            r, g, b = colorsys.hls_to_rgb(
-                swatch[0]/360, swatch[1]/100, swatch[2]/100)
-            self._theme[idx] = [round(r * 255), round(g * 255), round(b * 255)]
-        self._theme[0] = self._base_color
-
-        return self._theme
+        for rgb in out:
+            hex = self.rgb_to_hex(*rgb)
+            self._theme.append(hex)
+        print('Model output:', self._theme)
+        return self._theme.copy()

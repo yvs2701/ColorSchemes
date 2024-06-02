@@ -8,7 +8,8 @@ import os
 
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/build')
-cors = CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}})
+cors = CORS(app, resources={
+            r"/api/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}})
 
 
 def rgb_to_hex(rgb: list[int]) -> str:
@@ -52,25 +53,16 @@ def extract_colors():
 def generate_colors():
     try:
         req = request.get_json()
-        base_color = req['rgb_color']
-        tg = ThemeGenerator(base_color=base_color, isRGB=True)
+        base_colors = req['hex_colors']
+        print('Received Base_Colors for theme generation:', base_colors)
+
+        tg = ThemeGenerator(base_colors=base_colors, isHex=True)
         theme = tg.generate()
-        hexcodes = []
 
-        for _, swatch in enumerate(theme):
-            hexcodes.append(rgb_to_hex(swatch))
-
-        labels = ['primary_color', 'secondary_color',
-                  'primary_tint', 'secondary_tint',
-                  'primary_shadow', 'secondary_shadow']
-
-        dict_theme = list(zip(labels, theme))
-        dict_hexcodes = list(zip(labels, hexcodes))
-
-        return jsonify({'hex_colors': dict_hexcodes, 'rgb_colors': dict_theme}), 200
+        return jsonify({'hex_colors': theme}), 200
 
     except KeyError:
-        return jsonify({'error': 'rgb_color not found in request'}), 400
+        return jsonify({'error': 'color data not found in request'}), 400
     except Exception as e:
         print(e)
         return jsonify({'error': 'Some error occured!'}), 500
