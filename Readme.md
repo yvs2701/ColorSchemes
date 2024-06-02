@@ -1,10 +1,13 @@
 # ColorSchemes
+
+!['Demo GIF'](./frontend/public/samples/demo.gif)
+
 The primary objective of our project is to provide a convenient SaaS where users can generate a theme for their UX purposes. The project targets designers and creative people. We want fashion designers, user experience developers, event planners, product innovators and social media creators to use our website and are able to reproduce colors and themes that they envision in their heads.\
-The website provides the frontend interface for users to upload an image which can be a brand logo, the view from their apartment, cloth accessories, or a random photograph. The server will then process the image and extract colors which make it up. Then we artistically generate a theme of four to six color swatches, and relay it back to the user.
+The website provides the frontend interface for users to upload an image which can be a brand logo, the view from their apartment, cloth accessories, or a random photograph. The server will then process the image and extract colors which make it up. Then our GAN generates a theme of five color swatches, and relays it back to the user.
 
-Users will also get font and color recommendations for software experience aspects, and generative AI will be used to present the mockup of a room and a web layout where the suggested theme is applied for better visualization.
+Future additions may include a generative model to produce AI generated image mockups of sample objects.
 
-Link to used dataset: [Hugging Face](https://huggingface.co/datasets/huggingface-projects/color-palettes-sd)
+Link to the dataset: [Hugging Face](https://huggingface.co/datasets/huggingface-projects/color-palettes-sd)
 
 ## Installation
 To install the project, follow these steps:
