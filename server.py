@@ -7,9 +7,8 @@ import numpy as np
 import os
 
 
-app = Flask(__name__, static_url_path='', static_folder='frontend/build')
-cors = CORS(app, resources={
-            r"/api/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}})
+app = Flask(__name__, static_folder='frontend/build')
+cors = CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://localhost:5000"]}})
 
 
 def rgb_to_hex(rgb: list[int]) -> str:
@@ -68,9 +67,10 @@ def generate_colors():
         return jsonify({'error': 'Some error occured!'}), 500
 
 
-@app.route('/', defaults={'path': 'index.html'})
+@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serverFrontend(path):
+    print('(CATCH ALL ROUTE) Catching path:', path)
     if path != "" and os.path.exists(app.static_folder + '/' + path):
         return send_from_directory(app.static_folder, path)
     else:

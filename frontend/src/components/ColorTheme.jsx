@@ -63,16 +63,11 @@ export default function ColorTheme() {
 
   return (
     <>
-      <main
-        className="flex p-4 w-full bg-base-300 min-h-screen">
+      <main className="flex p-4 w-full bg-base-300 min-h-screen">
 
-        <section
-          className="flex flex-col flex-initial bg-base-100 w-1/3 min-h-full rounded-box p-4 justify-between items-center"
-        >
+        <section className="flex flex-col flex-initial bg-base-100 w-1/3 min-h-full rounded-box p-4 justify-between items-center">
           {/* HEADER */}
-          <h1
-            className="md:text-4xl lg:text-5xl text-center mt-16"
-          >
+          <h1 className="md:text-4xl lg:text-5xl text-center mt-16">
             Pick a Color
           </h1>
 
