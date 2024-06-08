@@ -149,7 +149,9 @@ export default function ColorTheme() {
                   </div>
                 </div>
                 <button onClick={() => lockColor(idx)} className="btn btn-block border-none rounded-none">
-                  Lock
+                  {
+                    colors.locked[idx] ? "Locked: " + (idx + 1) : "Lock"
+                  }
                 </button>
               </div>
             ))
